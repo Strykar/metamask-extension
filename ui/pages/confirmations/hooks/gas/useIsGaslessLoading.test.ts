@@ -112,6 +112,18 @@ describe('useIsGaslessLoading', () => {
     expect(result.isGaslessLoading).toBe(false);
   });
 
+  it('returns false for a money account withdraw even when gas fee tokens are still loading', async () => {
+    const result = await runHook({
+      simulationEnabled: true,
+      gaslessSupported: true,
+      insufficientBalance: true,
+      gasFeeTokens: undefined,
+      type: TransactionType.moneyAccountWithdraw,
+    });
+
+    expect(result.isGaslessLoading).toBe(false);
+  });
+
   it('returns true if gas fee tokens are undefined (still loading)', async () => {
     const result = await runHook({
       simulationEnabled: true,
