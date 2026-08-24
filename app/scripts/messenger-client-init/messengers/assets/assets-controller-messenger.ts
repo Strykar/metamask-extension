@@ -66,6 +66,8 @@ export function getAssetsControllerMessenger(
       'AccountTreeController:selectedAccountGroupChange',
       // core#9892: start asset tracking only after the tree is fully built
       'AccountTreeController:initialized',
+      // Stop asset tracking when the account tree is cleared
+      'AccountTreeController:uninitialized',
       // core#9478: use exported :stateChange (not local :stateChanged aliases)
       // Still needed for post-init account-set changes (e.g. snap accounts)
       'AccountTreeController:stateChange',
