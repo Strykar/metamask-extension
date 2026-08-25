@@ -143,6 +143,7 @@ function render(
     hasPositiveRequiredAmount?: boolean;
     isNativePayToken?: boolean;
     isNoFeePayToken?: boolean;
+    isRelayExactInputDeposit?: boolean;
     sourceAmounts?: { targetTokenAddress: string }[];
     requiredTokens?: { address: string; skipIfBalance: boolean }[];
     primaryRequiredToken?: typeof MOCK_PRIMARY_REQUIRED_TOKEN | undefined;
@@ -165,6 +166,7 @@ function render(
     hasPositiveRequiredAmount = true,
     isNativePayToken = false,
     isNoFeePayToken = false,
+    isRelayExactInputDeposit = false,
     sourceAmounts = [],
     requiredTokens = [],
     withdraw = { isWithdraw: false, canSelectWithdrawToken: false },
@@ -210,6 +212,9 @@ function render(
         ? [{ strategy: TransactionPayStrategy.Relay } as never]
         : undefined,
     );
+  jest
+    .mocked(useTransactionPayDataModule.useIsRelayExactInputDeposit)
+    .mockReturnValue(isRelayExactInputDeposit);
   jest
     .mocked(useTransactionPayDataModule.useIsTransactionPayQuotePending)
     .mockReturnValue(
@@ -590,6 +595,26 @@ describe('CustomAmountInfo', () => {
       expect(getByTestId('bridge-fee-row')).toBeInTheDocument();
       expect(getByTestId('bridge-time-row')).toBeInTheDocument();
       expect(getByTestId('total-row')).toBeInTheDocument();
+    });
+
+    it('renders the receive row for exact-input Relay deposits', () => {
+      const { getByTestId, queryByTestId } = render({
+        hasQuotes: true,
+        isRelayExactInputDeposit: true,
+      });
+
+      expect(getByTestId('receive-row')).toBeInTheDocument();
+      expect(queryByTestId('total-row')).not.toBeInTheDocument();
+    });
+
+    it('keeps the total row for non-Relay deposits', () => {
+      const { getByTestId, queryByTestId } = render({
+        hasQuotes: true,
+        isRelayExactInputDeposit: false,
+      });
+
+      expect(getByTestId('total-row')).toBeInTheDocument();
+      expect(queryByTestId('receive-row')).not.toBeInTheDocument();
     });
 
     it('does not render result rows when no quotes and not loading', () => {

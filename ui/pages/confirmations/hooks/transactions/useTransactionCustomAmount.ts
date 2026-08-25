@@ -14,8 +14,10 @@ import { useConfirmContext } from '../../context/confirm';
 import { usePayWithNoFeeToken } from '../pay/usePayWithNoFeeToken';
 import { useTransactionPayToken } from '../pay/useTransactionPayToken';
 import {
+  useIsRelayExactInputDeposit,
   useTransactionPayIsMaxAmount,
   useTransactionPayPrimaryRequiredToken,
+  useTransactionPayTotals,
 } from '../pay/useTransactionPayData';
 import { getTokenAddress } from '../../utils/transaction-pay';
 import { useDepositPrefillAmount } from './useDepositPrefillAmount';
@@ -55,6 +57,7 @@ export function useTransactionCustomAmount({
   const { chainId, id: transactionId } = transactionMeta ?? {};
 
   const isMaxAmount = useTransactionPayIsMaxAmount();
+  const isRelayExactInputDeposit = useIsRelayExactInputDeposit();
   const tokenAddress = getTokenAddress(transactionMeta);
   const tokenFiatRate =
     useTokenFiatRate(tokenAddress, chainId as Hex, currency) ?? 1;
@@ -129,9 +132,15 @@ export function useTransactionCustomAmount({
   }, [disableUpdate, transactionId, updateTokenAmountCallback]);
 
   const primaryRequiredToken = useTransactionPayPrimaryRequiredToken();
+  const totals = useTransactionPayTotals();
+  // A remounted exact-input confirmation must restore the source total, not
+  // the post-fee target amount stored on the required token.
+  const initialAmountUsd = isRelayExactInputDeposit
+    ? totals?.sourceAmount.usd
+    : primaryRequiredToken?.amountUsd;
 
   const [amountFiatState, setAmountFiat] = useState(
-    new BigNumber(primaryRequiredToken?.amountUsd ?? '0')
+    new BigNumber(initialAmountUsd ?? '0')
       .round(2, BigNumber.ROUND_HALF_UP)
       .toString(10),
   );
@@ -139,14 +148,27 @@ export function useTransactionCustomAmount({
   const amountFiat = useMemo(() => {
     const targetAmountUsd = primaryRequiredToken?.amountUsd;
 
-    if (isMaxAmount && targetAmountUsd && targetAmountUsd !== '0') {
+    // For Relay exact-input deposits, the quote target is the amount received
+    // after fees, not the total source amount selected by Max. Keep the input
+    // amount in state so it does not jump down when the quote resolves.
+    if (
+      !isRelayExactInputDeposit &&
+      isMaxAmount &&
+      targetAmountUsd &&
+      targetAmountUsd !== '0'
+    ) {
       return new BigNumber(targetAmountUsd)
         .round(2, BigNumber.ROUND_HALF_UP)
         .toString(10);
     }
 
     return amountFiatState;
-  }, [amountFiatState, isMaxAmount, primaryRequiredToken?.amountUsd]);
+  }, [
+    amountFiatState,
+    isMaxAmount,
+    isRelayExactInputDeposit,
+    primaryRequiredToken?.amountUsd,
+  ]);
 
   const amountHuman = useMemo(
     () =>

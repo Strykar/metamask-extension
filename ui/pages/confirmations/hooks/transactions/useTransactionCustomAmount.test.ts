@@ -3,6 +3,7 @@ import {
   TransactionType,
   type TransactionMeta,
 } from '@metamask/transaction-controller';
+import type { TransactionPayTotals } from '@metamask/transaction-pay-controller';
 import { act } from '@testing-library/react';
 import { genUnapprovedContractInteractionConfirmation } from '../../../../../test/data/confirmations/contract-interaction';
 import { getMockConfirmStateForTransaction } from '../../../../../test/data/confirmations/helper';
@@ -55,7 +56,9 @@ function runHook({
   balanceUsdOverride,
   isNoFeePayToken = true,
   isMaxAmount = false,
+  isRelayExactInputDeposit = false,
   requiredTokens = [],
+  totals,
   updateTokenAmountMock = jest.fn(),
   prefillMaxOnLoad = false,
   transactionMeta = MOCK_TRANSACTION_META,
@@ -72,7 +75,9 @@ function runHook({
   balanceUsdOverride?: number;
   isNoFeePayToken?: boolean;
   isMaxAmount?: boolean;
+  isRelayExactInputDeposit?: boolean;
   requiredTokens?: { amountUsd?: string; skipIfBalance?: boolean }[];
+  totals?: TransactionPayTotals;
   updateTokenAmountMock?: jest.Mock;
   prefillMaxOnLoad?: boolean;
   transactionMeta?: TransactionMeta;
@@ -84,6 +89,12 @@ function runHook({
   jest
     .mocked(useTransactionPayDataModule.useTransactionPayIsMaxAmount)
     .mockReturnValue(isMaxAmount);
+  jest
+    .mocked(useTransactionPayDataModule.useIsRelayExactInputDeposit)
+    .mockReturnValue(isRelayExactInputDeposit);
+  jest
+    .mocked(useTransactionPayDataModule.useTransactionPayTotals)
+    .mockReturnValue(totals);
   jest
     .mocked(useTransactionPayDataModule.useTransactionPayRequiredTokens)
     .mockReturnValue(
@@ -164,6 +175,47 @@ describe('useTransactionCustomAmount', () => {
       });
 
       expect(result.current.amountFiat).toBe('123.46');
+    });
+
+    it('keeps the entered total when a Relay exact-input Max quote resolves', () => {
+      const { result, rerender } = runHook({
+        isRelayExactInputDeposit: true,
+      });
+
+      act(() => {
+        result.current.updatePendingAmount('100');
+      });
+
+      jest
+        .mocked(useTransactionPayDataModule.useTransactionPayIsMaxAmount)
+        .mockReturnValue(true);
+      jest
+        .mocked(
+          useTransactionPayDataModule.useTransactionPayPrimaryRequiredToken,
+        )
+        .mockReturnValue({
+          amountUsd: '95',
+          skipIfBalance: false,
+        } as ReturnType<
+          typeof useTransactionPayDataModule.useTransactionPayPrimaryRequiredToken
+        >);
+
+      rerender();
+
+      expect(result.current.amountFiat).toBe('100');
+    });
+
+    it('restores the source total when mounting with a Relay exact-input quote', () => {
+      const { result } = runHook({
+        isMaxAmount: true,
+        isRelayExactInputDeposit: true,
+        requiredTokens: [{ amountUsd: '95', skipIfBalance: false }],
+        totals: {
+          sourceAmount: { usd: '100' },
+        } as TransactionPayTotals,
+      });
+
+      expect(result.current.amountFiat).toBe('100');
     });
 
     it('pre-populates from transaction data when user has not typed yet', () => {
