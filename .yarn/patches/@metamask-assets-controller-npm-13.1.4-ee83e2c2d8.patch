@@ -1,0 +1,28 @@
+diff --git a/dist/utils/snaps-assets-migration.cjs b/dist/utils/snaps-assets-migration.cjs
+index 867a9e0dda25a26f3dbd9cf2c496f0263c97553c..461f4c8ca269bd4fbc0c5cd0a55ea5d69931f0ea 100644
+--- a/dist/utils/snaps-assets-migration.cjs
++++ b/dist/utils/snaps-assets-migration.cjs
+@@ -164,6 +164,9 @@ function shouldSupportChain(chainId, remoteFeatureFlags) {
+     if (!namespace) {
+         return true;
+     }
++    if (namespace === 'tron') {
++        return true;
++    }
+     const stage = parseSnapsAssetsMigrationStage(remoteFeatureFlags?.[exports.SNAPS_ASSETS_MIGRATION_FLAG_KEYS[namespace]]);
+     return isMigrationStageActive(stage);
+ }
+diff --git a/dist/utils/snaps-assets-migration.mjs b/dist/utils/snaps-assets-migration.mjs
+index 926f711691c175f5070be82eae62ad99b85cae36..4a97499b82e33caf10017519d9a88bbf9206ce01 100644
+--- a/dist/utils/snaps-assets-migration.mjs
++++ b/dist/utils/snaps-assets-migration.mjs
+@@ -156,6 +156,9 @@ export function shouldSupportChain(chainId, remoteFeatureFlags) {
+     if (!namespace) {
+         return true;
+     }
++    if (namespace === 'tron') {
++        return true;
++    }
+     const stage = parseSnapsAssetsMigrationStage(remoteFeatureFlags?.[SNAPS_ASSETS_MIGRATION_FLAG_KEYS[namespace]]);
+     return isMigrationStageActive(stage);
+ }

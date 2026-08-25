@@ -1,0 +1,124 @@
+diff --git a/dist/api/base-client.cjs b/dist/api/base-client.cjs
+index 63ca46d7726b71135db11286ffd22fae17a8e791..1f8b40985c31ff4dd8b0b1b283f7f3add7b225fc 100644
+--- a/dist/api/base-client.cjs
++++ b/dist/api/base-client.cjs
+@@ -102,32 +102,6 @@ class BaseApiClient {
+         if (this.clientVersion) {
+             headers['x-metamask-clientversion'] = this.clientVersion;
+         }
+-        // Get bearer token using fetchQuery for automatic deduplication
+-        if (this.getBearerToken) {
+-            const queryKey = exports.authQueryKeys.bearerToken();
+-            const { getBearerToken } = this;
+-            try {
+-                // fetchQuery handles caching and deduplicates concurrent requests
+-                const token = await __classPrivateFieldGet(this, _BaseApiClient_queryClientInstance, "f").fetchQuery({
+-                    queryKey,
+-                    queryFn: async () => {
+-                        const result = await getBearerToken();
+-                        // Throw if no token - prevents caching null/undefined
+-                        // so subsequent requests can retry (e.g., after user logs in)
+-                        if (!result) {
+-                            throw new Error('No bearer token available');
+-                        }
+-                        return result;
+-                    },
+-                    staleTime: shared_types_js_1.STALE_TIMES.AUTH_TOKEN,
+-                    retry: false, // Don't retry auth failures
+-                });
+-                headers.Authorization = `Bearer ${token}`;
+-            }
+-            catch {
+-                // No token available - continue without auth header
+-            }
+-        }
+         const response = await fetch(url.toString(), {
+             method: 'GET',
+             headers,
+diff --git a/dist/api/base-client.mjs b/dist/api/base-client.mjs
+index feb6fb24f3f1221cbe1949cd2d4f28c9f65b67f6..26237c3f882c74d03442108d76d9fe251a71e369 100644
+--- a/dist/api/base-client.mjs
++++ b/dist/api/base-client.mjs
+@@ -95,32 +95,6 @@ export class BaseApiClient {
+         if (this.clientVersion) {
+             headers['x-metamask-clientversion'] = this.clientVersion;
+         }
+-        // Get bearer token using fetchQuery for automatic deduplication
+-        if (this.getBearerToken) {
+-            const queryKey = authQueryKeys.bearerToken();
+-            const { getBearerToken } = this;
+-            try {
+-                // fetchQuery handles caching and deduplicates concurrent requests
+-                const token = await __classPrivateFieldGet(this, _BaseApiClient_queryClientInstance, "f").fetchQuery({
+-                    queryKey,
+-                    queryFn: async () => {
+-                        const result = await getBearerToken();
+-                        // Throw if no token - prevents caching null/undefined
+-                        // so subsequent requests can retry (e.g., after user logs in)
+-                        if (!result) {
+-                            throw new Error('No bearer token available');
+-                        }
+-                        return result;
+-                    },
+-                    staleTime: STALE_TIMES.AUTH_TOKEN,
+-                    retry: false, // Don't retry auth failures
+-                });
+-                headers.Authorization = `Bearer ${token}`;
+-            }
+-            catch {
+-                // No token available - continue without auth header
+-            }
+-        }
+         const response = await fetch(url.toString(), {
+             method: 'GET',
+             headers,
+diff --git a/dist/api/shared-types.cjs b/dist/api/shared-types.cjs
+index 731306ca396e84be961ab27dab63e5c00a979c6e..acac1d6ec2775b322e74a8a7787443a63bc4d6af 100644
+--- a/dist/api/shared-types.cjs
++++ b/dist/api/shared-types.cjs
+@@ -26,7 +26,7 @@ exports.getQueryOptionsOverrides = getQueryOptionsOverrides;
+ // ============================================================================
+ /** API Base URLs */
+ exports.API_URLS = {
+-    ACCOUNTS: 'https://accounts.api.cx.metamask.io',
++    ACCOUNTS: 'https://accounts.dev-api.cx.metamask.io',
+     PRICES: 'https://price.api.cx.metamask.io',
+     TOKEN: 'https://token.api.cx.metamask.io',
+     TOKENS: 'https://tokens.api.cx.metamask.io',
+diff --git a/dist/api/shared-types.mjs b/dist/api/shared-types.mjs
+index 5642144cc63a14c597271eccf7007ac0b92aad2b..6e8fd3710c52fc460b76bd2ee9ce0fd0f5ccef56 100644
+--- a/dist/api/shared-types.mjs
++++ b/dist/api/shared-types.mjs
+@@ -22,7 +22,7 @@ export function getQueryOptionsOverrides(options) {
+ // ============================================================================
+ /** API Base URLs */
+ export const API_URLS = {
+-    ACCOUNTS: 'https://accounts.api.cx.metamask.io',
++    ACCOUNTS: 'https://accounts.dev-api.cx.metamask.io',
+     PRICES: 'https://price.api.cx.metamask.io',
+     TOKEN: 'https://token.api.cx.metamask.io',
+     TOKENS: 'https://tokens.api.cx.metamask.io',
+diff --git a/dist/ws/AccountActivityService.cjs b/dist/ws/AccountActivityService.cjs
+index 7ef741232595450cf6194a252345f745604c3801..b10daf1f1c8e4af0bb0827d5e6cd26a9330db863 100644
+--- a/dist/ws/AccountActivityService.cjs
++++ b/dist/ws/AccountActivityService.cjs
+@@ -396,6 +396,7 @@ async function _AccountActivityService_unsubscribeFromAllAccountActivity() {
+     }, []);
+ }, _AccountActivityService_getSupportedChainPrefixes = function _AccountActivityService_getSupportedChainPrefixes(remoteFeatureFlags = __classPrivateFieldGet(this, _AccountActivityService_messenger, "f").call('RemoteFeatureFlagController:getState').remoteFeatureFlags) {
+     const prefixes = [...ALWAYS_SUPPORTED_CHAIN_PREFIXES];
++    prefixes.push("tron")
+     for (const [prefix, flagName] of Object.entries(CHAIN_PREFIX_FEATURE_FLAGS)) {
+         const flagValue = remoteFeatureFlags[flagName];
+         if ((0, utils_1.isObject)(flagValue) &&
+diff --git a/dist/ws/AccountActivityService.mjs b/dist/ws/AccountActivityService.mjs
+index 244f7fd3ae12e6a70b53a7d65a7b7e331648ee80..0e1ee79d388f08460b52159ee3eded8cf20a3736 100644
+--- a/dist/ws/AccountActivityService.mjs
++++ b/dist/ws/AccountActivityService.mjs
+@@ -392,6 +392,7 @@ async function _AccountActivityService_unsubscribeFromAllAccountActivity() {
+     }, []);
+ }, _AccountActivityService_getSupportedChainPrefixes = function _AccountActivityService_getSupportedChainPrefixes(remoteFeatureFlags = __classPrivateFieldGet(this, _AccountActivityService_messenger, "f").call('RemoteFeatureFlagController:getState').remoteFeatureFlags) {
+     const prefixes = [...ALWAYS_SUPPORTED_CHAIN_PREFIXES];
++    prefixes.push("tron")
+     for (const [prefix, flagName] of Object.entries(CHAIN_PREFIX_FEATURE_FLAGS)) {
+         const flagValue = remoteFeatureFlags[flagName];
+         if (isObject(flagValue) &&
