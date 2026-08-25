@@ -95,13 +95,7 @@ export function ReceiveRow({
     return formatFiat(
       (youReceive.gte(0) ? youReceive : new BigNumber(0)).toNumber(),
     );
-  }, [
-    hasQuotes,
-    inputAmountUsd,
-    totals,
-    formatFiat,
-    useQuoteTargetAmount,
-  ]);
+  }, [hasQuotes, inputAmountUsd, totals, formatFiat, useQuoteTargetAmount]);
 
   const isSmall = variant === ConfirmInfoRowSize.Small;
   const textVariant = isSmall ? TextVariant.bodyMd : TextVariant.bodyMdMedium;
