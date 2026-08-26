@@ -53,4 +53,21 @@ describe('getTransactionPayControllerInitMessenger', () => {
 
     expect(transactionPayControllerInitMessenger).toBeInstanceOf(Messenger);
   });
+
+  it('delegates amount-commit TransactionController and AccountsController actions', () => {
+    const messenger = getRootMessenger<never, never>();
+    const delegateSpy = jest.spyOn(messenger, 'delegate');
+
+    getTransactionPayControllerInitMessenger(messenger);
+
+    expect(delegateSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        actions: expect.arrayContaining([
+          'AccountsController:getSelectedAccount',
+          'TransactionController:getState',
+          'TransactionController:updateTransaction',
+        ]),
+      }),
+    );
+  });
 });

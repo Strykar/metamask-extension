@@ -77,7 +77,15 @@ const BalanceProjectionContent = ({
     );
   }, [amount, apyDecimal, projectedYears]);
 
-  if (vaultApyQuery.isLoading) {
+  // Fallback / override APY is usable while the live query is in flight —
+  // same rule as the money home page (`isLoading && !apyDisplay`). Waiting
+  // on the query alone leaves the deposit subtitle on a skeleton forever
+  // when getVaultApy is slow or never settles.
+  if (
+    vaultApyQuery.isLoading &&
+    !isPositiveNumberOrZero(apyDecimal) &&
+    !isPositiveNumberOrZero(apyPercent)
+  ) {
     return (
       <Box data-testid="balance-projection-skeleton">
         <Skeleton height={20} width={160} />

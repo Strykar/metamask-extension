@@ -127,6 +127,32 @@ describe('BalanceProjection', () => {
     ).toBeInTheDocument();
   });
 
+  it('shows the projection while APY is loading when a fallback rate is available', () => {
+    mockBalance({ apyDecimal: 0.04, apyPercent: 4, isLoading: true });
+
+    renderProjection('1000');
+
+    expect(screen.getByTestId('balance-projection')).toBeInTheDocument();
+    expect(screen.getByText('$1,040.00')).toBeInTheDocument();
+    expect(
+      screen.queryByTestId('balance-projection-skeleton'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows the APY pitch while loading when a fallback rate is available and amount is zero', () => {
+    mockBalance({ apyDecimal: 0.069, apyPercent: 6.9, isLoading: true });
+
+    renderProjection('0');
+
+    expect(
+      screen.getByTestId('balance-projection-apy-pitch'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Earn 6.9% APY')).toBeInTheDocument();
+    expect(
+      screen.queryByTestId('balance-projection-skeleton'),
+    ).not.toBeInTheDocument();
+  });
+
   it('returns nothing when APY is unavailable', () => {
     mockBalance({ apyDecimal: undefined, apyPercent: undefined });
 
