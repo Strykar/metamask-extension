@@ -3,7 +3,6 @@ import {
   TransactionType,
   type TransactionMeta,
 } from '@metamask/transaction-controller';
-import type { TransactionPayTotals } from '@metamask/transaction-pay-controller';
 import { act } from '@testing-library/react';
 import { genUnapprovedContractInteractionConfirmation } from '../../../../../test/data/confirmations/contract-interaction';
 import { getMockConfirmStateForTransaction } from '../../../../../test/data/confirmations/helper';
@@ -13,6 +12,7 @@ import * as TransactionPayControllerActions from '../../../../store/controller-a
 import * as useTokenFiatRatesModule from '../tokens/useTokenFiatRates';
 import * as usePayWithNoFeeTokenModule from '../pay/usePayWithNoFeeToken';
 import * as useTransactionPayDataModule from '../pay/useTransactionPayData';
+import type { TransactionPayTotalsWithInputBased } from '../pay/useTransactionPayData';
 import * as useTransactionPayTokenModule from '../pay/useTransactionPayToken';
 import {
   useTransactionCustomAmount,
@@ -56,7 +56,6 @@ function runHook({
   balanceUsdOverride,
   isNoFeePayToken = true,
   isMaxAmount = false,
-  isRelayExactInputDeposit = false,
   requiredTokens = [],
   totals,
   updateTokenAmountMock = jest.fn(),
@@ -75,9 +74,8 @@ function runHook({
   balanceUsdOverride?: number;
   isNoFeePayToken?: boolean;
   isMaxAmount?: boolean;
-  isRelayExactInputDeposit?: boolean;
   requiredTokens?: { amountUsd?: string; skipIfBalance?: boolean }[];
-  totals?: TransactionPayTotals;
+  totals?: TransactionPayTotalsWithInputBased;
   updateTokenAmountMock?: jest.Mock;
   prefillMaxOnLoad?: boolean;
   transactionMeta?: TransactionMeta;
@@ -89,9 +87,6 @@ function runHook({
   jest
     .mocked(useTransactionPayDataModule.useTransactionPayIsMaxAmount)
     .mockReturnValue(isMaxAmount);
-  jest
-    .mocked(useTransactionPayDataModule.useIsRelayExactInputDeposit)
-    .mockReturnValue(isRelayExactInputDeposit);
   jest
     .mocked(useTransactionPayDataModule.useTransactionPayTotals)
     .mockReturnValue(totals);
@@ -168,18 +163,24 @@ describe('useTransactionCustomAmount', () => {
       expect(result.current.amountFiat).toBe('0');
     });
 
-    it('returns target amount USD when isMaxAmount is true and target amount exists', () => {
+    it('returns target amount USD for output-based Max totals', () => {
       const { result } = runHook({
         isMaxAmount: true,
         requiredTokens: [{ amountUsd: '123.456', skipIfBalance: false }],
+        totals: {
+          isInputBased: false,
+        } as TransactionPayTotalsWithInputBased,
       });
 
       expect(result.current.amountFiat).toBe('123.46');
     });
 
-    it('keeps the entered total when a Relay exact-input Max quote resolves', () => {
+    it('keeps the entered total when an input-based Max quote resolves', () => {
       const { result, rerender } = runHook({
-        isRelayExactInputDeposit: true,
+        totals: {
+          isInputBased: true,
+          sourceAmount: { usd: '0' },
+        } as TransactionPayTotalsWithInputBased,
       });
 
       act(() => {
@@ -205,20 +206,20 @@ describe('useTransactionCustomAmount', () => {
       expect(result.current.amountFiat).toBe('100');
     });
 
-    it('restores the source total when mounting with a Relay exact-input quote', () => {
+    it('restores the source total when mounting with input-based totals', () => {
       const { result } = runHook({
         isMaxAmount: true,
-        isRelayExactInputDeposit: true,
         requiredTokens: [{ amountUsd: '95', skipIfBalance: false }],
         totals: {
+          isInputBased: true,
           sourceAmount: { usd: '100' },
-        } as TransactionPayTotals,
+        } as TransactionPayTotalsWithInputBased,
       });
 
       expect(result.current.amountFiat).toBe('100');
     });
 
-    it('pre-populates from transaction data when user has not typed yet', () => {
+    it('pre-populates from transaction data when totals are missing', () => {
       const { result } = runHook({
         isMaxAmount: false,
         requiredTokens: [{ amountUsd: '123.456', skipIfBalance: false }],

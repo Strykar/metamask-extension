@@ -37,12 +37,12 @@ import { useTransactionPayPostQuote } from '../../../hooks/pay/useTransactionPay
 import { useTransactionPayWithdraw } from '../../../hooks/pay/useTransactionPayWithdraw';
 import type { SetPayTokenRequest } from '../../../hooks/pay/types';
 import {
-  useIsRelayExactInputDeposit,
   useIsTransactionPayQuotePending,
   useTransactionPayHasExecutableQuote,
   useTransactionPayHasPositiveRequiredAmount,
   useTransactionPayPrimaryRequiredToken,
   useTransactionPayQuotes,
+  useTransactionPayTotals,
 } from '../../../hooks/pay/useTransactionPayData';
 import { useTransactionPayMetrics } from '../../../hooks/pay/useTransactionPayMetrics';
 import { useTransactionPayAvailableTokens } from '../../../hooks/pay/useTransactionPayAvailableTokens';
@@ -347,11 +347,10 @@ function BottomContainer({
 
   const isPerpsWithdraw = isPerpsWithdrawTransaction(currentConfirmation);
   // Withdrawals show Receive only when post-quote token selection is enabled;
-  // otherwise the direct transfer keeps its regular Total. Plain Perps and
-  // Predict deposits show Receive only for Relay exact-input quotes, preserving
-  // Across behavior. Mirrors mobile `CustomAmountTotals`.
+  // otherwise the direct transfer keeps its regular Total. Input-based quotes
+  // show Receive according to the controller-owned totals semantics.
   const { canSelectWithdrawToken } = useTransactionPayWithdraw();
-  const isRelayExactInputDeposit = useIsRelayExactInputDeposit();
+  const isInputBased = useTransactionPayTotals()?.isInputBased === true;
 
   return (
     <Box
@@ -373,10 +372,9 @@ function BottomContainer({
             }
           />
           <BridgeTimeRow rowVariant={ConfirmInfoRowSize.Small} />
-          {canSelectWithdrawToken || isRelayExactInputDeposit ? (
+          {canSelectWithdrawToken || isInputBased ? (
             <ReceiveRow
               inputAmountUsd={amountFiat}
-              useQuoteTargetAmount={isRelayExactInputDeposit}
               variant={ConfirmInfoRowSize.Small}
             />
           ) : (
