@@ -150,7 +150,12 @@ export function useTransactionCustomAmount({
     // For input-based quotes, the quote target is the amount received after
     // fees, not the total source amount selected by Max. Keep the input amount
     // in state so it does not jump down when the quote resolves.
-    if (!isInputBased && isMaxAmount && targetAmountUsd && targetAmountUsd !== '0') {
+    if (
+      !isInputBased &&
+      isMaxAmount &&
+      targetAmountUsd &&
+      targetAmountUsd !== '0'
+    ) {
       return new BigNumber(targetAmountUsd)
         .round(2, BigNumber.ROUND_HALF_UP)
         .toString(10);

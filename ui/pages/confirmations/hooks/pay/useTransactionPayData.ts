@@ -66,9 +66,9 @@ export type TransactionPayTotalsWithInputBased = TransactionPayTotals & {
 export function useTransactionPayTotals():
   | TransactionPayTotalsWithInputBased
   | undefined {
-  return useTransactionPayData(
-    selectTransactionPayTotalsByTransactionId,
-  ) as TransactionPayTotalsWithInputBased | undefined;
+  return useTransactionPayData(selectTransactionPayTotalsByTransactionId) as
+    | TransactionPayTotalsWithInputBased
+    | undefined;
 }
 
 export function useTransactionPayIsMaxAmount() {
