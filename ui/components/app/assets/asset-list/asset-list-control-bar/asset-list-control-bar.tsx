@@ -347,7 +347,7 @@ const AssetListControlBar = ({
     if (isAssetsUnifyStateEnabled && selectedInternalAccount) {
       dispatch(
         refreshAssetsForSelectedAccount([selectedInternalAccount], {
-          chainIds: allEnabledNetworksForAllNamespaces,
+          chainIds: selectedCaipChainIds,
           assetTypes: ['token', 'price', 'metadata'],
         }),
       );
