@@ -6535,10 +6535,6 @@
     "message": "Bu cüzdan için $1 kurulumu yapılmamış. Ayarlarda $1 seçeneğini açın.",
     "description": "Shown when biometrics unlock fails because no passkey is enrolled. $1 is the OS-specific auth-method noun (Biometrics / Touch ID / Windows Hello)."
   },
-  "passkeyErrorNotSupported": {
-    "message": "Geçiş anahtarı desteklenmiyor",
-    "description": "Shown when passkey setup fails because the authenticator does not return the required PRF extension result."
-  },
   "passkeyErrorRegistrationFailed": {
     "message": "$1 kurulumu başarısız oldu. Tekrar deneyin",
     "description": "Shown when onboarding biometrics registration fails with an unknown error (after specific biometrics error messages). $1 is the OS-specific auth-method noun (Biometrics / Touch ID / Windows Hello)."

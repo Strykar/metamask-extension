@@ -6531,10 +6531,6 @@
     "message": "$1 ist für diese Wallet nicht eingerichtet. Schalten Sie $1 in den Einstellungen ein.",
     "description": "Shown when biometrics unlock fails because no passkey is enrolled. $1 is the OS-specific auth-method noun (Biometrics / Touch ID / Windows Hello)."
   },
-  "passkeyErrorNotSupported": {
-    "message": "Passwort wird nicht unterstützt",
-    "description": "Shown when passkey setup fails because the authenticator does not return the required PRF extension result."
-  },
   "passkeyErrorRegistrationFailed": {
     "message": "$1-Einrichtung fehlgeschlagen. Versuchen Sie es erneut.",
     "description": "Shown when onboarding biometrics registration fails with an unknown error (after specific biometrics error messages). $1 is the OS-specific auth-method noun (Biometrics / Touch ID / Windows Hello)."

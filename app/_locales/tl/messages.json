@@ -6531,10 +6531,6 @@
     "message": "Hindi naka-set up para sa wallet na ito ang $1. I-on ang $1 sa Mga Setting.",
     "description": "Shown when biometrics unlock fails because no passkey is enrolled. $1 is the OS-specific auth-method noun (Biometrics / Touch ID / Windows Hello)."
   },
-  "passkeyErrorNotSupported": {
-    "message": "Hindi sinusuportahan ang passkey",
-    "description": "Shown when passkey setup fails because the authenticator does not return the required PRF extension result."
-  },
   "passkeyErrorRegistrationFailed": {
     "message": "Pumalya ang pag-set up ng $1. Subukan ulit.",
     "description": "Shown when onboarding biometrics registration fails with an unknown error (after specific biometrics error messages). $1 is the OS-specific auth-method noun (Biometrics / Touch ID / Windows Hello)."

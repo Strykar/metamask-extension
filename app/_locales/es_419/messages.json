@@ -6535,10 +6535,6 @@
     "message": "$1 no se ha configurado para esta billetera. Activa $1 en Configuración.",
     "description": "Shown when biometrics unlock fails because no passkey is enrolled. $1 is the OS-specific auth-method noun (Biometrics / Touch ID / Windows Hello)."
   },
-  "passkeyErrorNotSupported": {
-    "message": "Clave de acceso no admitida",
-    "description": "Shown when passkey setup fails because the authenticator does not return the required PRF extension result."
-  },
   "passkeyErrorRegistrationFailed": {
     "message": "Error al configurar $1. Inténtalo de nuevo",
     "description": "Shown when onboarding biometrics registration fails with an unknown error (after specific biometrics error messages). $1 is the OS-specific auth-method noun (Biometrics / Touch ID / Windows Hello)."

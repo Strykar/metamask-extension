@@ -6531,10 +6531,6 @@
     "message": "此钱包未设置 $1。请在设置中开启 $1。",
     "description": "Shown when biometrics unlock fails because no passkey is enrolled. $1 is the OS-specific auth-method noun (Biometrics / Touch ID / Windows Hello)."
   },
-  "passkeyErrorNotSupported": {
-    "message": "不支持通行密钥",
-    "description": "Shown when passkey setup fails because the authenticator does not return the required PRF extension result."
-  },
   "passkeyErrorRegistrationFailed": {
     "message": "$1 设置失败。请重试",
     "description": "Shown when onboarding biometrics registration fails with an unknown error (after specific biometrics error messages). $1 is the OS-specific auth-method noun (Biometrics / Touch ID / Windows Hello)."

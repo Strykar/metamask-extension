@@ -6531,10 +6531,6 @@
     "message": "इस वॉलेट के लिए $1 सेटअप नहीं है। सेटिंग्स में जाकर $1 को चालू करें।",
     "description": "Shown when biometrics unlock fails because no passkey is enrolled. $1 is the OS-specific auth-method noun (Biometrics / Touch ID / Windows Hello)."
   },
-  "passkeyErrorNotSupported": {
-    "message": "पासकी सपोर्टेड नहीं है",
-    "description": "Shown when passkey setup fails because the authenticator does not return the required PRF extension result."
-  },
   "passkeyErrorRegistrationFailed": {
     "message": "$1 सेटअप नहीं हो पाया। फिर से प्रयास करें",
     "description": "Shown when onboarding biometrics registration fails with an unknown error (after specific biometrics error messages). $1 is the OS-specific auth-method noun (Biometrics / Touch ID / Windows Hello)."
